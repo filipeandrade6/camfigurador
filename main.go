@@ -191,3 +191,5 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
             // Pressed OK button save to model and goes to camera config
             if s == "enter" && m.focusIndexCamera == len
+
+            TODO adicionar restante
