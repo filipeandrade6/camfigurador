@@ -296,7 +296,7 @@ func (m model) View() string {
 		fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
 	case camera:
-		fmt.Fprintf(&b, "[%s - %s] * [Ctrl+C] ou ESC para reconfigurar acesso\n\n", m.addr, m.user)
+		fmt.Fprintf(&b, "[%s - %s] • [Ctrl+C] ou ESC para reconfigurar acesso\n\n", m.addr, m.user)
 
 		for i := range m.inputsCamera {
 			b.WriteString(m.inputsCamera[i].View())
