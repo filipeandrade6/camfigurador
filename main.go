@@ -20,14 +20,14 @@ var (
 	blurredButton = fmt.Sprintf("[ %s ]", blurredStyle.Render("OK"))
 )
 
-type CameraCfg struct {
-	IPAddr       string
-	Gateway      string
-	SubnetMask   string
-	ChannelTitle string
-	Hostname     string
-	Ponto        string
-}
+// type CameraCfg struct {
+// 	IPAddr       string
+// 	Gateway      string
+// 	SubnetMask   string
+// 	ChannelTitle string
+// 	Hostname     string
+// 	Ponto        string
+// }
 
 type model struct {
 	inputsAccess     []textinput.Model
@@ -37,10 +37,13 @@ type model struct {
 
 	stage stage
 
-	user         string
-	pass         string
-	addr         string
-	manufacturer string
+	user string
+	pass string
+	addr string
+
+	response CameraInfo
+
+	err error // TODO definir Cmd proprio erro igual no github?
 }
 
 type stage int
@@ -48,6 +51,7 @@ type stage int
 const (
 	access stage = iota
 	camera
+	response
 )
 
 func initialModel() model {
@@ -176,8 +180,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyMsg:
 			switch msg.String() {
 			case "ctrl+c", "esc":
-				m.printerer()
-				return m, nil // TODO voltar para access?
+				m.cameraToAccess()
+				return m, nil
 
 			case "tab", "shift+tab", "enter", "up", "down":
 				s := msg.String()
@@ -185,7 +189,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				// Pressed OK button save to model and goes to camera config
 				if s == "enter" && m.focusIndexCamera == len(m.inputsCamera) {
 					// m.saveToModel() // TODO dispatch urls
-					m.printerer()
+					// m.printerer()
+					m.getCamera()
 					return m, nil
 				}
 
@@ -264,12 +269,27 @@ func (m *model) saveToModel() {
 	m.inputsCamera[0].TextStyle = focusedStyle
 }
 
-func (m *model) printerer() {
+func (m *model) cameraToAccess() {
 	m.stage = access
 	m.focusIndexCamera = 0
 	m.inputsAccess[0].Focus()
 	m.inputsAccess[0].PromptStyle = focusedStyle
 	m.inputsAccess[0].TextStyle = focusedStyle
+}
+
+func (m *model) getCamera() {
+	camCfg, err := IdentificadorDeModelo(
+		m.inputsAccess[0].Value(),
+		m.inputsAccess[1].Value(),
+		m.inputsAccess[2].Value(),
+	)
+	if err != nil {
+		m.err = err
+		return
+	}
+
+	m.response = camCfg
+	m.stage = response
 }
 
 func (m model) View() string {
@@ -310,6 +330,13 @@ func (m model) View() string {
 			button = &focusedButton
 		}
 		fmt.Fprintf(&b, "\n\n%s\n\n", *button)
+
+	case response:
+		if m.err != nil {
+			fmt.Fprintf(&b, "erro: %+v • [Ctrl+C] ou ESC para reconfigurar acesso\n\n", m.err)
+			return b.String()
+		}
+		fmt.Fprintf(&b, "[%+v] • [Ctrl+C] ou ESC para reconfigurar acesso\n\n", m.response)
 	}
 
 	return b.String()

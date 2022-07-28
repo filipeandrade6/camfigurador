@@ -35,6 +35,7 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 		return c, errors.New("erro na autenticação - verificar usuário e senha")
 
 	case 200:
+		fmt.Println("1")
 		c.Fabricante = "dahua"
 
 		// Parse Modelo --------------------------------
@@ -43,15 +44,18 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 
+		fmt.Println("2")
 		s := strings.Split(body, "=")
 		c.Modelo = strings.ToUpper(s[1])
+		fmt.Println(c.Modelo)
 
 		// Parse Serial Number -------------------------
-		body, status, err = Requisitador(t, fmt.Sprintf("https://%s/cgi-bin/magicBox.cgi?action=getSerialNo", ip))
+		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSerialNo", ip))
 		if err != nil || status != 200 {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 
+		fmt.Println("3")
 		s = strings.Split(body, "=")
 		c.NumeroSerie = strings.ToUpper(s[1])
 
@@ -61,9 +65,10 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 
+		fmt.Println("4")
 		s = strings.Split(body, "eth0.PhysicalAddress=")
-		s = strings.Split(s[1], "=")
-		c.MAC = strings.Trim(strings.ToUpper(s[0]), ":")
+		s = strings.Split(s[1], "table")
+		c.MAC = strings.ReplaceAll(strings.ToUpper(s[0]), ":", "")
 
 		// Parse Firmware Number -----------------------
 		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSoftwareVersion", ip))
@@ -71,6 +76,7 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 
+		fmt.Println("5")
 		s = strings.Split(body, "=")
 		s = strings.Split(s[1], ",")
 		c.VersaoFW = s[0]
@@ -109,7 +115,7 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 				return c, fmt.Errorf("status: %d, error: %w", status, err)
 			}
 			s = strings.Split(body, "=")
-			c.MAC = strings.Trim(strings.ToUpper(s[1]), ":")
+			c.MAC = strings.ReplaceAll(strings.ToUpper(s[1]), ":", "")
 
 			// Parse Firmware Number -----------------------
 			body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Properties.Firmware.Version", ip))
@@ -120,8 +126,8 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 			c.VersaoFW = strings.ToUpper(s[1])
 
 		case 404:
-			return c, errors.New("dispositivo desconhecido")
 			// TODO testar novo VAPIX (tem que utilizar POST Method)
+			return c, errors.New("dispositivo desconhecido")
 
 		default:
 			return c, fmt.Errorf("status: %d, error: status desconhecido", status)
