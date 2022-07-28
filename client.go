@@ -12,15 +12,46 @@ import (
 )
 
 type CameraInfo struct {
-	Fabricante  string
-	Modelo      string
-	NumeroSerie string
-	MAC         string
-	VersaoFW    string
+	Manufacturer string
+	Model        string
+	serialNumber string
+	MAC          string
+	Software     string
+}
+
+const (
+	camModel = iota
+	serialNumber
+	mac
+	software
+)
+
+func getURLs(manufacturer string) map[int]string {
+	switch manufacturer {
+	case "axis":
+		return map[int]string{
+			camModel:     "/axis-cgi/param.cgi?action=list&group=Brand.ProdShortName",
+			serialNumber: "/axis-cgi/param.cgi?action=list&group=Properties.System.SerialNumber",
+			mac:          "/axis-cgi/param.cgi?action=list&group=Network.eth0.MACAddress",
+			software:     "/axis-cgi/param.cgi?action=list&group=Properties.Firmware.Version",
+		}
+
+	case "dahua":
+		return map[int]string{
+			camModel:     "/cgi-bin/magicBox.cgi?action=getDeviceType",
+			serialNumber: "/cgi-bin/magicBox.cgi?action=getSerialNo",
+			mac:          "/cgi-bin/configManager.cgi?action=getConfig&name=Network.eth0.PhysicalAddress",
+			software:     "/cgi-bin/magicBox.cgi?action=getSoftwareVersion",
+		}
+
+	}
+
+	return nil // TODO verificar
 }
 
 func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 	var c CameraInfo
+	response := make(map[int]string)
 
 	t := dac.NewTransport(usuario, senha)
 	t.HTTPClient = &http.Client{Timeout: 2 * time.Second}
@@ -35,57 +66,52 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 		return c, errors.New("erro na autenticação - verificar usuário e senha")
 
 	case 200:
-		fmt.Println("1")
-		c.Fabricante = "dahua"
+		c.Manufacturer = "dahua"
+		response = getURLs("dahua")
 
-		// Parse Modelo --------------------------------
-		body, status, err := Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getDeviceType", ip))
-		if err != nil || status != 200 {
-			return c, fmt.Errorf("status: %d, error: %w", status, err)
-		}
+		// // Parse Modelo --------------------------------
+		// body, status, err := Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getDeviceType", ip))
+		// if err != nil || status != 200 {
+		// 	return c, fmt.Errorf("status: %d, error: %w", status, err)
+		// }
 
-		fmt.Println("2")
-		s := strings.Split(body, "=")
-		c.Modelo = strings.ToUpper(s[1])
-		fmt.Println(c.Modelo)
+		// s := strings.Split(body, "=")
+		// c.Model = strings.ToUpper(s[1])
+		// fmt.Println(c.Model)
 
-		// Parse Serial Number -------------------------
-		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSerialNo", ip))
-		if err != nil || status != 200 {
-			return c, fmt.Errorf("status: %d, error: %w", status, err)
-		}
+		// // Parse Serial Number -------------------------
+		// body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSerialNo", ip))
+		// if err != nil || status != 200 {
+		// 	return c, fmt.Errorf("status: %d, error: %w", status, err)
+		// }
 
-		fmt.Println("3")
-		s = strings.Split(body, "=")
-		c.NumeroSerie = strings.ToUpper(s[1])
+		// s = strings.Split(body, "=")
+		// c.serialNumber = strings.ToUpper(s[1])
 
-		// Parse MAC Number ----------------------------
-		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/configManager.cgi?action=getConfig&name=Network", ip))
-		if err != nil || status != 200 {
-			return c, fmt.Errorf("status: %d, error: %w", status, err)
-		}
+		// // Parse MAC Number ----------------------------
+		// body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/configManager.cgi?action=getConfig&name=Network.eth0.PhysicalAddress", ip))
+		// if err != nil || status != 200 {
+		// 	return c, fmt.Errorf("status: %d, error: %w", status, err)
+		// }
 
-		fmt.Println("4")
-		s = strings.Split(body, "eth0.PhysicalAddress=")
-		s = strings.Split(s[1], "table")
-		c.MAC = strings.ReplaceAll(strings.ToUpper(s[0]), ":", "")
+		// s = strings.Split(body, "=")
+		// c.MAC = strings.ReplaceAll(strings.ToUpper(s[1]), ":", "")
 
-		// Parse Firmware Number -----------------------
-		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSoftwareVersion", ip))
-		if err != nil || status != 200 {
-			return c, fmt.Errorf("status: %d, error: %w", status, err)
-		}
+		// // Parse Firmware Number -----------------------
+		// body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSoftwareVersion", ip))
+		// if err != nil || status != 200 {
+		// 	return c, fmt.Errorf("status: %d, error: %w", status, err)
+		// }
 
-		fmt.Println("5")
-		s = strings.Split(body, "=")
-		s = strings.Split(s[1], ",")
-		c.VersaoFW = s[0]
+		// s = strings.Split(body, "=")
+		// s = strings.Split(s[1], ",")
+		// c.Software = s[0]
 
 		return c, nil
 
 	case 404:
 		// Parse Modelo --------------------------------
-		body, status, err := Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Brand.ProdShortName", ip))
+		_, status, err := Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Brand.ProdShortName", ip))
 		if err != nil || status != 200 {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
@@ -95,35 +121,36 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 			return c, errors.New("erro na autenticação - verificar usuário e senha")
 
 		case 200:
-			c.Fabricante = "axis"
+			c.Manufacturer = "axis"
+			response = getURLs("axis")
 
-			// Parse Modelo --------------------------------
-			s := strings.Split(body, "=")
-			c.Modelo = s[1]
+			// // Parse Modelo --------------------------------
+			// s := strings.Split(body, "=")
+			// c.Model = s[1]
 
-			// Parse Serial Number -------------------------
-			body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Properties.System.SerialNumber", ip))
-			if err != nil || status != 200 {
-				return c, fmt.Errorf("status: %d, error: %w", status, err)
-			}
-			s = strings.Split(body, "=")
-			c.NumeroSerie = strings.ToUpper(s[1])
+			// // Parse Serial Number -------------------------
+			// body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Properties.System.SerialNumber", ip))
+			// if err != nil || status != 200 {
+			// 	return c, fmt.Errorf("status: %d, error: %w", status, err)
+			// }
+			// s = strings.Split(body, "=")
+			// c.serialNumber = strings.ToUpper(s[1])
 
-			// Parse MAC Number ----------------------------
-			body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Network.eth0.MACAddress", ip))
-			if err != nil || status != 200 {
-				return c, fmt.Errorf("status: %d, error: %w", status, err)
-			}
-			s = strings.Split(body, "=")
-			c.MAC = strings.ReplaceAll(strings.ToUpper(s[1]), ":", "")
+			// // Parse MAC Number ----------------------------
+			// body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Network.eth0.MACAddress", ip))
+			// if err != nil || status != 200 {
+			// 	return c, fmt.Errorf("status: %d, error: %w", status, err)
+			// }
+			// s = strings.Split(body, "=")
+			// c.MAC = strings.ReplaceAll(strings.ToUpper(s[1]), ":", "")
 
-			// Parse Firmware Number -----------------------
-			body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Properties.Firmware.Version", ip))
-			if err != nil || status != 200 {
-				return c, fmt.Errorf("status: %d, error: %w", status, err)
-			}
-			s = strings.Split(body, "=")
-			c.VersaoFW = strings.ToUpper(s[1])
+			// // Parse Firmware Number -----------------------
+			// body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Properties.Firmware.Version", ip))
+			// if err != nil || status != 200 {
+			// 	return c, fmt.Errorf("status: %d, error: %w", status, err)
+			// }
+			// s = strings.Split(body, "=")
+			// c.Software = strings.ToUpper(s[1])
 
 		case 404:
 			// TODO testar novo VAPIX (tem que utilizar POST Method)
@@ -137,6 +164,30 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 	default:
 		return c, fmt.Errorf("status: %d, error: status desconhecido", status)
 
+	}
+
+	for k, v := range response {
+		body, status, err := Requisitador(t, fmt.Sprintf("http:/%s%s", ip, v))
+		if err != nil || status != 200 {
+			return c, fmt.Errorf("status: %d, error: %w", status, err)
+		}
+		s := strings.Split(body, "=")
+		result := strings.ReplaceAll(strings.ToUpper(s[1]), ":", "")
+
+		switch k {
+		case camModel:
+			c.Model = result
+
+		case serialNumber:
+			c.serialNumber = result
+
+		case mac:
+			c.MAC = result
+
+		case software:
+			c.Software = result
+
+		}
 	}
 
 	return c, nil
