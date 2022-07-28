@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -31,53 +32,105 @@ func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
 
 	switch status {
 	case 401:
+		return c, errors.New("erro na autenticação - verificar usuário e senha")
 
 	case 200:
 		c.Fabricante = "dahua"
 
 		// Parse Modelo --------------------------------
-		body, status, err := Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getDeviceType", ip)) // type=IPC-HFW5242E-ZE-MF
+		body, status, err := Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getDeviceType", ip))
 		if err != nil || status != 200 {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 
 		s := strings.Split(body, "=")
-		c.Modelo = s[1]
+		c.Modelo = strings.ToUpper(s[1])
 
 		// Parse Serial Number -------------------------
-		body, status, err = Requisitador(t, fmt.Sprintf("https://%s/cgi-bin/magicBox.cgi?action=getSerialNo", ip)) // sn=6G06324PAG4549F
+		body, status, err = Requisitador(t, fmt.Sprintf("https://%s/cgi-bin/magicBox.cgi?action=getSerialNo", ip))
 		if err != nil || status != 200 {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 
 		s = strings.Split(body, "=")
-		c.NumeroSerie = s[1]
+		c.NumeroSerie = strings.ToUpper(s[1])
 
 		// Parse MAC Number ----------------------------
-		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/configManager.cgi?action=getConfig&name=Network", ip)) // ...table.Network.eth0.PhysicalAddress=bc:32:5f:22:bf:89...
+		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/configManager.cgi?action=getConfig&name=Network", ip))
 		if err != nil || status != 200 {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 
-		// TODO mais preparacao (mais dados agrupados)
-
-		s = strings.Split(body, "=")
-		c.MAC = s[1]
+		s = strings.Split(body, "eth0.PhysicalAddress=")
+		s = strings.Split(s[1], "=")
+		c.MAC = strings.Trim(strings.ToUpper(s[0]), ":")
 
 		// Parse Firmware Number -----------------------
-		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSoftwareVersion", ip)) // version=2.212.0000.0.R,build:2013-11-14
+		body, status, err = Requisitador(t, fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSoftwareVersion", ip))
 		if err != nil || status != 200 {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 
 		s = strings.Split(body, "=")
-		c.VersaoFW = s[1]
+		s = strings.Split(s[1], ",")
+		c.VersaoFW = s[0]
 
 		return c, nil
 
 	case 404:
+		// Parse Modelo --------------------------------
+		body, status, err := Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Brand.ProdShortName", ip))
+		if err != nil || status != 200 {
+			return c, fmt.Errorf("status: %d, error: %w", status, err)
+		}
+
+		switch status {
+		case 401:
+			return c, errors.New("erro na autenticação - verificar usuário e senha")
+
+		case 200:
+			c.Fabricante = "axis"
+
+			// Parse Modelo --------------------------------
+			s := strings.Split(body, "=")
+			c.Modelo = s[1]
+
+			// Parse Serial Number -------------------------
+			body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Properties.System.SerialNumber", ip))
+			if err != nil || status != 200 {
+				return c, fmt.Errorf("status: %d, error: %w", status, err)
+			}
+			s = strings.Split(body, "=")
+			c.NumeroSerie = strings.ToUpper(s[1])
+
+			// Parse MAC Number ----------------------------
+			body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Network.eth0.MACAddress", ip))
+			if err != nil || status != 200 {
+				return c, fmt.Errorf("status: %d, error: %w", status, err)
+			}
+			s = strings.Split(body, "=")
+			c.MAC = strings.Trim(strings.ToUpper(s[1]), ":")
+
+			// Parse Firmware Number -----------------------
+			body, status, err = Requisitador(t, fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Properties.Firmware.Version", ip))
+			if err != nil || status != 200 {
+				return c, fmt.Errorf("status: %d, error: %w", status, err)
+			}
+			s = strings.Split(body, "=")
+			c.VersaoFW = strings.ToUpper(s[1])
+
+		case 404:
+			return c, errors.New("dispositivo desconhecido")
+			// TODO testar novo VAPIX (tem que utilizar POST Method)
+
+		default:
+			return c, fmt.Errorf("status: %d, error: status desconhecido", status)
+
+		}
 
 	default:
+		return c, fmt.Errorf("status: %d, error: status desconhecido", status)
+
 	}
 
 	return c, nil
