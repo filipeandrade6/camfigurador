@@ -188,8 +188,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				// Pressed OK button save to model and goes to camera config
 				if s == "enter" && m.focusIndexCamera == len(m.inputsCamera) {
-					// m.saveToModel() // TODO dispatch urls
-					// m.printerer()
 					m.getCamera()
 					return m, nil
 				}
@@ -347,4 +345,8 @@ func main() {
 		fmt.Printf("erro: %s\n", err)
 		os.Exit(1)
 	}
+}
+
+func (m model) Configure() {
+
 }
