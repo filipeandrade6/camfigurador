@@ -1,12 +1,5 @@
 package main
 
-import (
-	"net/http"
-	"time"
-
-	dac "github.com/xinsnake/go-http-digest-auth-client"
-)
-
 var baseUrl = "/cgi-bin/configManager.cgi?action=setConfig&"
 
 type Configurator struct {
@@ -43,30 +36,30 @@ func NewDahuaConfigurator() map[int]string {
 	}
 }
 
-func (m model) configurar() error {
-	t := dac.NewTransport(m.user, m.pass)
-	t.HTTPClient = &http.Client{Timeout: 2 * time.Second}
+// func (m model) configurar() error {
+// 	t := dac.NewTransport(m.user, m.pass)
+// 	t.HTTPClient = &http.Client{Timeout: 2 * time.Second}
 
-	cfg := make(map[int]string)
+// 	cfg := make(map[int]string)
 
-	switch m.response.Manufacturer {
-	case "axis":
+// 	switch m.response.Manufacturer {
+// 	case "axis":
 
-	case "dahua":
-		cfg = NewDahuaConfigurator()
+// 	case "dahua":
+// 		cfg = NewDahuaConfigurator()
 
-	default:
-	}
+// 	default:
+// 	}
 
-	for k, v := range cfg {
-		switch v {
-			case
-		}
-		body, statusCode, err := Requisitador(t, url)
-		if err != nil {
-			return c, err
-		}
-	}
+// 	for k, v := range cfg {
+// 		switch v {
+// 			case
+// 		}
+// 		body, statusCode, err := Requisitador(t, url)
+// 		if err != nil {
+// 			return c, err
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }

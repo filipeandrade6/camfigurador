@@ -11,7 +11,7 @@ import (
 	dac "github.com/xinsnake/go-http-digest-auth-client"
 )
 
-type CameraInfo struct {
+type ConfigurationInfo struct {
 	Manufacturer string
 	Model        string
 	serialNumber string
@@ -26,8 +26,8 @@ const (
 	software
 )
 
-func IdentificadorDeModelo(ip, usuario, senha string) (CameraInfo, error) {
-	var c CameraInfo
+func IdentificadorDeModelo(ip, usuario, senha string) (ConfigurationInfo, error) {
+	var c ConfigurationInfo
 
 	t := dac.NewTransport(usuario, senha)
 	t.HTTPClient = &http.Client{Timeout: 2 * time.Second}
