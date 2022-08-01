@@ -33,18 +33,15 @@ func (m model) View() string {
 		if m.err != nil {
 			fmt.Fprintf(&b, "erro de acesso: %s \n[Ctrl+C] ou ESC para reconfigurar acesso", m.err)
 			return b.String()
-		} else {
-			fmt.Fprintf(&b,
-				"Fabricante: %s\nModelo: %s\nMAC: %s\nNúmero de série: %s\nSoftware: %s",
-				m.response.Manufacturer,
-				m.response.Model,
-				m.response.MAC,
-				m.response.serialNumber,
-				m.response.Software,
-			)
 		}
 
-		// fmt.Fprintf(&b, "[%s - %s] • [Ctrl+C] ou ESC para reconfigurar acesso\n\n", m.addr, m.user)
+		fmt.Fprintf(&b, "Fabricante: %s\n         Modelo: %s\n            MAC: %s\nNúmero de série: %s\n       Software: %s\n\n",
+			m.response.Manufacturer,
+			m.response.Model,
+			m.response.MAC,
+			m.response.serialNumber,
+			m.response.Software,
+		)
 
 		for i := range m.inputsConfiguration {
 			b.WriteString(m.inputsConfiguration[i].View())
