@@ -74,7 +74,7 @@ func IdentificadorDeModelo(ip, usuario, senha string) (ConfigurationInfo, error)
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}
 		s := strings.Split(body, "=")
-		result := strings.ReplaceAll(strings.ToUpper(s[1]), ":", "")
+		result := strings.TrimSuffix(strings.ReplaceAll(strings.ToUpper(s[1]), ":", ""), "\n")
 
 		switch k {
 		case camModel:

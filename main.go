@@ -8,15 +8,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// type ConfigurationCfg struct {
-// 	IPAddr       string
-// 	Gateway      string
-// 	SubnetMask   string
-// 	ChannelTitle string
-// 	Hostname     string
-// 	Ponto        string
-// }
-
 type model struct {
 	inputsCredentials     []textinput.Model
 	focusIndexCredentials int
@@ -25,10 +16,6 @@ type model struct {
 	focusIndexConfiguration int
 
 	stage stage
-
-	user string
-	pass string
-	addr string
 
 	response ConfigurationInfo
 

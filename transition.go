@@ -1,9 +1,20 @@
 package main
 
 func (m *model) credentialsToConfiguration() {
-	m.addr = m.inputsCredentials[0].Value()
-	m.user = m.inputsCredentials[1].Value()
-	m.pass = m.inputsCredentials[2].Value()
+	// m.addr = m.inputsCredentials[0].Value()
+	// m.user = m.inputsCredentials[1].Value()
+	// m.pass = m.inputsCredentials[2].Value()
+
+	camCfg, err := IdentificadorDeModelo(
+		m.inputsCredentials[0].Value(),
+		m.inputsCredentials[1].Value(),
+		m.inputsCredentials[2].Value(),
+	)
+	if err != nil {
+		m.err = err
+	}
+
+	m.response = camCfg
 
 	m.stage = configuration
 	m.focusIndexCredentials = 0

@@ -38,5 +38,4 @@ func (m *model) getConfiguration() {
 	}
 
 	m.response = camCfg
-	m.stage = response
 }
