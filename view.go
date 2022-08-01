@@ -8,12 +8,16 @@ import (
 func (m model) View() string {
 	var b strings.Builder
 
-	b.WriteString("\nC O N F I G U R A D O R  -  D E  -  C Â M E R A\n")
-	b.WriteString("Filipe Andrade -- filipe.engenhaira42@gmail.com\n\n")
+	b.WriteString("\n CONFIGURADOR - DE - CÂMERA\n")
+	b.WriteString("Filipe Andrade - filipe.engenharia42@gmail.com\n\n")
 
 	switch m.stage {
 	case credentials:
 		b.WriteString("[Ctrl+C] ou ESC para sair\n\n")
+
+		if m.err != nil {
+			fmt.Fprintf(&b, ">>> %s\n\n", m.err)
+		}
 
 		for i := range m.inputsCredentials {
 			b.WriteString(m.inputsCredentials[i].View())
@@ -29,13 +33,12 @@ func (m model) View() string {
 		fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
 	case configuration:
-		// TODO colocar a resposta do acesso e remover o [Ctrl+C] ou ESC para reconfigurar acesso.
 		if m.err != nil {
-			fmt.Fprintf(&b, "erro de acesso: %s \n[Ctrl+C] ou ESC para reconfigurar acesso", m.err)
+			m.configurationToCredentials()
 			return b.String()
 		}
 
-		fmt.Fprintf(&b, "Fabricante: %s\n         Modelo: %s\n            MAC: %s\nNúmero de série: %s\n       Software: %s\n\n",
+		fmt.Fprintf(&b, "      fabricante: %s\n          modelo: %s\n             MAC: %s\n número de série: %s\n        software: %s\n\n",
 			m.response.Manufacturer,
 			m.response.Model,
 			m.response.MAC,
