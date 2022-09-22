@@ -1,11 +1,11 @@
 package main
 
 func (m *model) credentialsToConfiguration() {
-	camCfg, err := IdentificadorDeModelo(
-		m.inputsCredentials[0].Value(),
-		m.inputsCredentials[1].Value(),
-		m.inputsCredentials[2].Value(),
-	)
+	m.deviceIP = m.inputsCredentials[0].Value() // TODO trocar o index de número para constante
+	m.httpTransport.Username = m.inputsCredentials[1].Value()
+	m.httpTransport.Password = m.inputsCredentials[2].Value()
+
+	camCfg, err := m.IdentificadorDeModelo()
 	if err != nil {
 		m.err = err
 		return

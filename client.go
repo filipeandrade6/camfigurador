@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"time"
 
 	dac "github.com/xinsnake/go-http-digest-auth-client"
 )
@@ -26,16 +25,13 @@ const (
 	software
 )
 
-func IdentificadorDeModelo(ip, usuario, senha string) (ConfigurationInfo, error) {
+func (m *model) IdentificadorDeModelo() (ConfigurationInfo, error) {
 	var c ConfigurationInfo
 
-	t := dac.NewTransport(usuario, senha)
-	t.HTTPClient = &http.Client{Timeout: 2 * time.Second}
+	urlDahua := fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSystemInfo", m.deviceIP)
+	urlAxis := fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Brand.ProdShortName", m.deviceIP)
 
-	urlDahua := fmt.Sprintf("http://%s/cgi-bin/magicBox.cgi?action=getSystemInfo", ip)
-	urlAxis := fmt.Sprintf("http://%s/axis-cgi/param.cgi?action=list&group=Brand.ProdShortName", ip)
-
-	_, statusCode, err := Requisitador(t, urlDahua)
+	_, statusCode, err := Requisitador(m.httpTransport, urlDahua)
 	if err != nil {
 		return c, err
 	}
@@ -46,7 +42,7 @@ func IdentificadorDeModelo(ip, usuario, senha string) (ConfigurationInfo, error)
 	case 200:
 		c.Manufacturer = "dahua"
 	case 404:
-		_, statusCode, err = Requisitador(t, urlAxis)
+		_, statusCode, err = Requisitador(m.httpTransport, urlAxis)
 		if err != nil {
 			return c, err
 		}
@@ -69,7 +65,7 @@ func IdentificadorDeModelo(ip, usuario, senha string) (ConfigurationInfo, error)
 	urls := getURLs(c.Manufacturer)
 
 	for k, v := range urls {
-		body, status, err := Requisitador(t, fmt.Sprintf("http://%s%s", ip, v))
+		body, status, err := Requisitador(m.httpTransport, fmt.Sprintf("http://%s%s", m.deviceIP, v))
 		if err != nil || status != 200 {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
 		}

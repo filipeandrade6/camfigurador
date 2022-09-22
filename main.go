@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	dac "github.com/xinsnake/go-http-digest-auth-client"
 )
 
 type model struct {
@@ -18,6 +21,10 @@ type model struct {
 	stage stage
 
 	response ConfigurationInfo
+
+	httpTransport dac.DigestTransport
+
+	deviceIP string
 
 	err error // TODO definir Cmd proprio erro igual no github?
 }
@@ -36,6 +43,9 @@ func initialModel() model {
 		inputsCredentials:   make([]textinput.Model, 3),
 		inputsConfiguration: make([]textinput.Model, 6),
 	}
+
+	m.httpTransport = dac.NewTransport("admin", "pmdf@1809")
+	m.httpTransport.HTTPClient = &http.Client{Timeout: 1 * time.Second}
 
 	var t textinput.Model
 	for i := range m.inputsCredentials {
