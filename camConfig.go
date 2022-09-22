@@ -5,15 +5,6 @@ import (
 	"strings"
 )
 
-// type ConfigurationCfg struct {
-// 	IPAddr       string
-// 	Gateway      string
-// 	SubnetMask   string
-// 	ChannelTitle string
-// 	Hostname     string
-// 	Ponto        string
-// }
-
 func (m *model) Configurar() error {
 	cfg := make(map[int]string)
 
@@ -34,14 +25,14 @@ func (m *model) Configurar() error {
 		url = strings.ReplaceAll(url, "%ponto%", m.inputsConfiguration[4].Value())
 
 		// userAdd
-		url = strings.ReplaceAll(url, "%userAddAdmin%", "ditec")
-		url = strings.ReplaceAll(url, "%passUserAddAdmin%", "DITECam%23%7B8863%7D")
+		url = strings.ReplaceAll(url, "%userAddAdmin%", "outro")
+		url = strings.ReplaceAll(url, "%passUserAddAdmin%", "outro")
 
 		// userAddSigeo
-		url = strings.ReplaceAll(url, "%userAddUser%", "sigeo")
-		url = strings.ReplaceAll(url, "%passUserAddUser%", "sigeo%402018")
+		url = strings.ReplaceAll(url, "%userAddUser%", "outro2")
+		url = strings.ReplaceAll(url, "%passUserAddUser%", "outro2")
 
-		// chagePass
+		// changePass
 		url = strings.ReplaceAll(url, "%senhaMaster%", "abc")
 		url = strings.ReplaceAll(url, "%senhaAntiga%", "def")
 
