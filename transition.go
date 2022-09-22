@@ -23,7 +23,13 @@ func (m *model) credentialsToConfiguration() {
 }
 
 func (m *model) configurationToCredentials() {
-	m.stage = credentials
+	err := m.Configurar()
+	if err != nil {
+		m.err = err
+		return
+	}
+
+	m.stage = credentials // TODO TROCAR
 	m.focusIndexConfiguration = 0
 	m.inputsCredentials[0].Focus()
 	m.inputsCredentials[0].PromptStyle = focusedStyle
