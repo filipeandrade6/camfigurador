@@ -11,6 +11,8 @@ func (m *model) credentialsToConfiguration() {
 		return
 	}
 
+	// TODO colocar um loading até terinar a requisição?
+
 	m.response = camCfg
 
 	m.stage = configuration

@@ -34,8 +34,7 @@ func (m model) View() string {
 
 	case configuration:
 		if m.err != nil {
-			m.configurationToCredentials()
-			return b.String()
+			return b.String() // TODO arrumar isso aqui
 		}
 
 		fmt.Fprintf(&b, "      fabricante: %s\n          modelo: %s\n             MAC: %s\n número de série: %s\n        software: %s\n\n",

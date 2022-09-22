@@ -66,9 +66,9 @@ func IdentificadorDeModelo(ip, usuario, senha string) (ConfigurationInfo, error)
 		return c, fmt.Errorf("status: %d, error: status desconhecido", statusCode)
 	}
 
-	response := getURLs(c.Manufacturer)
+	urls := getURLs(c.Manufacturer)
 
-	for k, v := range response {
+	for k, v := range urls {
 		body, status, err := Requisitador(t, fmt.Sprintf("http://%s%s", ip, v))
 		if err != nil || status != 200 {
 			return c, fmt.Errorf("status: %d, error: %w", status, err)
