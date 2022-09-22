@@ -26,16 +26,16 @@ func (m *model) updateInputsConfiguration(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func (m *model) getConfiguration() {
-	camCfg, err := IdentificadorDeModelo(
-		m.inputsCredentials[0].Value(),
-		m.inputsCredentials[1].Value(),
-		m.inputsCredentials[2].Value(),
-	)
-	if err != nil {
-		m.err = err
-		return
-	}
+// func (m *model) getConfiguration() {
+// 	camCfg, err := IdentificadorDeModelo(
+// 		m.inputsCredentials[0].Value(),
+// 		m.inputsCredentials[1].Value(),
+// 		m.inputsCredentials[2].Value(),
+// 	)
+// 	if err != nil {
+// 		m.err = err
+// 		return
+// 	}
 
-	m.response = camCfg
-}
+// 	m.response = camCfg
+// }
