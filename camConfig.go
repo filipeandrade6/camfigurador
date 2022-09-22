@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 // type ConfigurationCfg struct {
 // 	IPAddr       string
@@ -10,15 +13,6 @@ import "strings"
 // 	Hostname     string
 // 	Ponto        string
 // }
-
-type URLer struct {
-	urlBase string
-	items   []string
-}
-
-func (u *URLer) interpolar(ip string) string {
-	return "http://" + ip + u.urlBase
-}
 
 func (m *model) Configurar() error {
 	cfg := make(map[int]string)
@@ -32,13 +26,39 @@ func (m *model) Configurar() error {
 	default:
 	}
 
-	for k, v := range cfg {
+	for _, v := range cfg {
+		url := "http://" + m.deviceIP + v
 
-		url := "http://" + m.deviceIP + strings.Replace(v, '%'+k+'%', k)
+		// video
+		url = strings.ReplaceAll(url, "%localizacao%", m.inputsConfiguration[3].Value())
+		url = strings.ReplaceAll(url, "%ponto%", m.inputsConfiguration[4].Value())
 
-		body, statusCode, err := m.Requisitador(url)
+		// userAdd
+		url = strings.ReplaceAll(url, "%userAddAdmin%", "ditec")
+		url = strings.ReplaceAll(url, "%passUserAddAdmin%", "DITECam%23%7B8863%7D")
+
+		// userAddSigeo
+		url = strings.ReplaceAll(url, "%userAddUser%", "sigeo")
+		url = strings.ReplaceAll(url, "%passUserAddUser%", "sigeo%402018")
+
+		// chagePass
+		url = strings.ReplaceAll(url, "%senhaMaster%", "abc")
+		url = strings.ReplaceAll(url, "%senhaAntiga%", "def")
+
+		// network
+		// TODO trocar o IP vai ser necessário alterar o IP base
+		url = strings.ReplaceAll(url, "%patrimonio%", m.inputsConfiguration[5].Value())
+		url = strings.ReplaceAll(url, "%ip%", m.inputsConfiguration[0].Value())
+		url = strings.ReplaceAll(url, "%gateway%", m.inputsConfiguration[1].Value())
+		url = strings.ReplaceAll(url, "%mascara%", m.inputsConfiguration[2].Value())
+
+		_, statusCode, err := m.Requisitador(url)
 		if err != nil {
-			return c, err
+			return err
+		}
+
+		if statusCode != 200 {
+			return errors.New("não é status 200")
 		}
 	}
 

@@ -127,5 +127,7 @@ func getURLs(manufacturer string) map[int]string {
 
 	}
 
+	// TODO colocar um caso não encontre o modelo
+
 	return nil
 }
