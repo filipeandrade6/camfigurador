@@ -34,7 +34,7 @@ type stage int
 const (
 	credentials stage = iota
 	configuration
-	response
+	final
 )
 
 func initialModel() model {

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (m *model) Configurar() error {
+func (m *model) Configurar() {
 	cfg := make(map[int]string)
 
 	switch m.response.Manufacturer {
@@ -45,13 +45,15 @@ func (m *model) Configurar() error {
 
 		_, statusCode, err := m.Requisitador(url)
 		if err != nil {
-			return err
+			m.err = err
+			return
 		}
 
 		if statusCode != 200 {
-			return errors.New("não é status 200")
+			m.err = errors.New("não é status 200")
+			return
 		}
 	}
 
-	return nil
+	return
 }

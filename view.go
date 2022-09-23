@@ -58,7 +58,7 @@ func (m model) View() string {
 		}
 		fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
-	case response:
+	case final:
 		if m.err != nil {
 			fmt.Fprintf(&b, "erro: %+v • [Ctrl+C] ou ESC para reconfigurar acesso\n\n", m.err)
 			return b.String()

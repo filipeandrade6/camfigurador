@@ -23,12 +23,6 @@ func (m *model) credentialsToConfiguration() {
 }
 
 func (m *model) configurationToCredentials() {
-	err := m.Configurar()
-	if err != nil {
-		m.err = err
-		return
-	}
-
 	m.stage = credentials // TODO TROCAR
 	m.focusIndexConfiguration = 0
 	m.inputsCredentials[0].Focus()

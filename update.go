@@ -69,7 +69,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				// Pressed OK button save to model and goes to configuration config
 				if s == "enter" && m.focusIndexConfiguration == len(m.inputsConfiguration) {
-					// TODO colocar o configurador aqui
+					m.limparError()
 					m.Configurar()
 					return m, nil
 				}
@@ -108,6 +108,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd := m.updateInputsConfiguration(msg)
 
 		return m, cmd
+
+	case final:
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			switch msg.String() {
+			case "ctrl+c", "esc":
+				m.configurationToCredentials() // TODO renomear
+				return m, nil
+			}
+		}
 	}
 
 	return m, nil
