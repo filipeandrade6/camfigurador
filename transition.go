@@ -23,7 +23,7 @@ func (m *model) credentialsToConfiguration() {
 }
 
 func (m *model) configurationToCredentials() {
-	m.stage = credentials // TODO TROCAR
+	m.stage = credentials
 	m.focusIndexConfiguration = 0
 	m.inputsCredentials[0].Focus()
 	m.inputsCredentials[0].PromptStyle = focusedStyle

@@ -16,7 +16,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				// Pressed OK button save to model and goes to configuration config
 				if s == "enter" && m.focusIndexCredentials == len(m.inputsCredentials) {
-					m.limparError()
 					m.credentialsToConfiguration()
 					return m, nil
 				}

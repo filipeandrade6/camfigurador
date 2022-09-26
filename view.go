@@ -17,6 +17,7 @@ func (m model) View() string {
 
 		if m.err != nil {
 			fmt.Fprintf(&b, ">>> %s\n\n", m.err)
+			m.limparError()
 		}
 
 		for i := range m.inputsCredentials {
@@ -33,8 +34,11 @@ func (m model) View() string {
 		fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
 	case configuration:
+		b.WriteString("[Ctrl+C] ou ESC para voltar\n\n") // TODO verficiar se funcionar
+
 		if m.err != nil {
-			return b.String() // TODO arrumar isso aqui
+			fmt.Fprintf(&b, ">>> %s\n\n", m.err)
+			m.limparError()
 		}
 
 		fmt.Fprintf(&b, "      fabricante: %s\n          modelo: %s\n             MAC: %s\n número de série: %s\n        software: %s\n\n",
