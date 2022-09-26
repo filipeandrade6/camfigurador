@@ -1,11 +1,13 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"strings"
 )
 
-func (m *model) Configurar() {
+// TODO codificar tudo para URL
+
+func (m *model) Configurar() error {
 	cfg := make(map[int]string)
 
 	switch m.response.Manufacturer {
@@ -26,11 +28,11 @@ func (m *model) Configurar() {
 
 		// userAdd
 		url = strings.ReplaceAll(url, "%userAddAdmin%", "outro")
-		url = strings.ReplaceAll(url, "%passUserAddAdmin%", "outro")
+		url = strings.ReplaceAll(url, "%passUserAddAdmin%", "8t%25fbNRFpS80lGqo")
 
 		// userAddSigeo
 		url = strings.ReplaceAll(url, "%userAddUser%", "outro2")
-		url = strings.ReplaceAll(url, "%passUserAddUser%", "outro2")
+		url = strings.ReplaceAll(url, "%passUserAddUser%", "8t%25fbNRFpS80lGqo")
 
 		// changePass
 		url = strings.ReplaceAll(url, "%senhaMaster%", "abc")
@@ -43,17 +45,17 @@ func (m *model) Configurar() {
 		url = strings.ReplaceAll(url, "%gateway%", m.inputsConfiguration[1].Value())
 		url = strings.ReplaceAll(url, "%mascara%", m.inputsConfiguration[2].Value())
 
-		_, statusCode, err := m.Requisitador(url)
+		fmt.Println(url)
+
+		body, statusCode, err := m.Requisitador(url)
 		if err != nil {
-			m.err = err
-			return
+			return err
 		}
 
 		if statusCode != 200 {
-			m.err = errors.New("não é status 200")
-			return
+			return fmt.Errorf("não é status 200 - code: %d - body: %s", statusCode, body)
 		}
 	}
 
-	return
+	return nil
 }

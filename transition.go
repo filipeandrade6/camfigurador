@@ -13,6 +13,7 @@ func (m *model) credentialsToConfiguration() {
 
 	// TODO colocar um loading até terinar a requisição?
 
+	m.err = nil
 	m.response = camCfg
 
 	m.stage = configuration

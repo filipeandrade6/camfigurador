@@ -68,7 +68,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				// Pressed OK button save to model and goes to configuration config
 				if s == "enter" && m.focusIndexConfiguration == len(m.inputsConfiguration) {
-					m.Configurar()
+					if err := m.Configurar(); err != nil {
+						m.err = err
+						return m, nil
+					}
+					// TODO transition to finals
 					return m, nil
 				}
 
