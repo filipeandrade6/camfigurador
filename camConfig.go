@@ -6,6 +6,7 @@ import (
 )
 
 // TODO codificar tudo para URL
+// TODO preparar para AXIS
 
 func (m *model) Configurar() error {
 	cfg := make(map[int]string)
