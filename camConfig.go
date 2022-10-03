@@ -7,6 +7,7 @@ import (
 
 // TODO codificar tudo para URL
 // TODO preparar para AXIS
+// TODO criar API separada para integrar com Bot Telegram ou Mattermost
 
 func (m *model) Configurar() error {
 	cfg := make(map[int]string)
