@@ -42,6 +42,7 @@ func (m *model) Configurar() error {
 
 		// network
 		// TODO trocar o IP vai ser necessário alterar o IP base
+		// TODO criar novo campo no model para novo ip?
 		url = strings.ReplaceAll(url, "%patrimonio%", m.inputsConfiguration[5].Value())
 		url = strings.ReplaceAll(url, "%ip%", m.inputsConfiguration[0].Value())
 		url = strings.ReplaceAll(url, "%gateway%", m.inputsConfiguration[1].Value())
