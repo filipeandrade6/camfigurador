@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -22,35 +23,37 @@ func (m *model) Configurar() error {
 	}
 
 	for _, v := range cfg {
-		url := "http://" + m.deviceIP + v
+		u := "http://" + m.deviceIP + v
 
 		// video
-		url = strings.ReplaceAll(url, "%localizacao%", m.inputsConfiguration[3].Value())
-		url = strings.ReplaceAll(url, "%ponto%", m.inputsConfiguration[4].Value())
+		l := &url.URL{Path: m.inputsConfiguration[3].Value()}
+		p := &url.URL{Path: m.inputsConfiguration[4].Value()}
+		u = strings.ReplaceAll(u, "%localizacao%", l.String())
+		u = strings.ReplaceAll(u, "%ponto%", p.String())
 
 		// userAdd
-		url = strings.ReplaceAll(url, "%userAddAdmin%", "outro")
-		url = strings.ReplaceAll(url, "%passUserAddAdmin%", "8t%25fbNRFpS80lGqo")
+		u = strings.ReplaceAll(u, "%userAddAdmin%", "outro")
+		u = strings.ReplaceAll(u, "%passUserAddAdmin%", "8t%25fbNRFpS80lGqo")
 
 		// userAddSigeo
-		url = strings.ReplaceAll(url, "%userAddUser%", "outro2")
-		url = strings.ReplaceAll(url, "%passUserAddUser%", "8t%25fbNRFpS80lGqo")
+		u = strings.ReplaceAll(u, "%userAddUser%", "outro2")
+		u = strings.ReplaceAll(u, "%passUserAddUser%", "8t%25fbNRFpS80lGqo")
 
 		// changePass
-		url = strings.ReplaceAll(url, "%senhaMaster%", "abc")
-		url = strings.ReplaceAll(url, "%senhaAntiga%", "def")
+		u = strings.ReplaceAll(u, "%senhaMaster%", "abc")
+		u = strings.ReplaceAll(u, "%senhaAntiga%", "def")
 
 		// network
 		// TODO trocar o IP vai ser necessário alterar o IP base
 		// TODO criar novo campo no model para novo ip?
-		url = strings.ReplaceAll(url, "%patrimonio%", m.inputsConfiguration[5].Value())
-		url = strings.ReplaceAll(url, "%ip%", m.inputsConfiguration[0].Value())
-		url = strings.ReplaceAll(url, "%gateway%", m.inputsConfiguration[1].Value())
-		url = strings.ReplaceAll(url, "%mascara%", m.inputsConfiguration[2].Value())
+		u = strings.ReplaceAll(u, "%patrimonio%", url.QueryEscape(m.inputsConfiguration[5].Value()))
+		u = strings.ReplaceAll(u, "%ip%", url.QueryEscape(m.inputsConfiguration[0].Value()))
+		u = strings.ReplaceAll(u, "%gateway%", url.QueryEscape(m.inputsConfiguration[1].Value()))
+		u = strings.ReplaceAll(u, "%mascara%", url.QueryEscape(m.inputsConfiguration[2].Value()))
 
-		fmt.Println(url)
+		fmt.Println(u)
 
-		body, statusCode, err := m.Requisitador(url)
+		body, statusCode, err := m.Requisitador(u)
 		if err != nil {
 			return err
 		}
