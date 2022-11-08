@@ -11,7 +11,7 @@ import (
 // TODO criar API separada para integrar com Bot Telegram ou Mattermost
 
 func (m *model) Configurar() error {
-	cfg := make(map[int]string)
+	cfg := make(map[string]string)
 
 	switch m.response.Manufacturer {
 	case "axis":
