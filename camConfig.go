@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 )
 
 // TODO codificar tudo para URL
@@ -22,7 +23,7 @@ func (m *model) Configurar() error {
 	default:
 	}
 
-	for _, v := range cfg {
+	for k, v := range cfg {
 		u := "http://" + m.deviceIP + v
 
 		// video
@@ -51,15 +52,15 @@ func (m *model) Configurar() error {
 		u = strings.ReplaceAll(u, "%gateway%", url.QueryEscape(m.inputsConfiguration[1].Value()))
 		u = strings.ReplaceAll(u, "%mascara%", url.QueryEscape(m.inputsConfiguration[2].Value()))
 
-		fmt.Println(u)
-
 		body, statusCode, err := m.Requisitador(u)
 		if err != nil {
 			return err
 		}
 
+		time.Sleep(time.Second * 1)
+
 		if statusCode != 200 {
-			return fmt.Errorf("não é status 200 - code: %d - body: %s", statusCode, body)
+			return fmt.Errorf("não é status 200 - code: %d - body: %s - url: %s - path: %s", statusCode, body, k, u) // TODO remover a url
 		}
 	}
 

@@ -12,16 +12,16 @@ type Configurator struct {
 	ChangePass   string
 }
 
-const (
-	condition = iota
-	video
-	title
-	network
-	date
-	userAdd
-	userAddSigeo
-	changePass
-)
+// const (
+// 	condition = iota
+// 	video
+// 	title
+// 	network
+// 	date
+// 	userAdd
+// 	userAddSigeo
+// 	changePass
+// )
 
 // TODO exposure e outros parametros não estão funcionando
 
@@ -30,7 +30,7 @@ func NewDahuaConfigurator() map[string]string {
 		// condition:    "/cgi-bin/configManager.cgi?action=setConfig&VideoInBacklight[0][2].Mode=WideDynamic&VideoInBacklight[0][2].WideDynamicRange=20&VideoInExposure[0][2].Compensation=20&VideoInDayNight[0][2].Mode=Color&VideoInMode[0].Config[0]=2",
 		// video:        "/cgi-bin/configManager.cgi?action=setConfig&Encode[0].MainFormat[0].Video.Compression=H.264&Encode[0].MainFormat[0].Video.Profile=Main&Encode[0].MainFormat[0].Video.resolution=1920x1080&Encode[0].MainFormat[0].Video.Height=1080&Encode[0].MainFormat[0].Video.Width=1920&Encode[0].MainFormat[0].Video.FPS=16&Encode[0].MainFormat[0].Video.BitRateControl=CBR&Encode[0].MainFormat[0].Video.BitRate=4096&Encode[0].MainFormat[0].Video.GOP=32",
 
-		"title": "/cgi-bin/configManager.cgi?action=setConfig&ChannelTitle[0].Name=SSP%2FDF%20-%20%localizacao%%20-%20%ponto%&table.VideoWidget[0].FontSize=32&table.VideoWidget[0].ChannelTitle.FrontColor[0]=255&table.VideoWidget[0].ChannelTitle.FrontColor[1]=255&table.VideoWidget[0].ChannelTitle.FrontColor[2]=0&table.VideoWidget[0].ChannelTitle.FrontColor[3]=0",
+		"title": "/cgi-bin/configManager.cgi?action=setConfig&ChannelTitle[0].Name=SSP%2FDF%20-%20%localizacao%%20-%20%ponto%&table.VideoWidget[0].FontSize=32",
 
 		"channelTitle":      "/cgi-bin/configManager.cgi?action=setConfig&table.VideoWidget[0].ChannelTitle.FrontColor[0]=255&table.VideoWidget[0].ChannelTitle.FrontColor[1]=255&table.VideoWidget[0].ChannelTitle.FrontColor[2]=0&table.VideoWidget[0].ChannelTitle.FrontColor[3]=0",
 		"covers0":           "/cgi-bin/configManager.cgi?action=setConfig&table.VideoWidget[0].Covers[0].FrontColor[0]=255&table.VideoWidget[0].Covers[0].FrontColor[1]=255&table.VideoWidget[0].Covers[0].FrontColor[2]=0&table.VideoWidget[0].Covers[0].FrontColor[3]=0",
